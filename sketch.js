@@ -6,6 +6,7 @@ var enemies,enemyimg;
 var pipesGroup,cloudsGroup;
 var PLAY =1;
 var END = 0;
+var collision;
 var gameState = PLAY;
 var score = 5;
 var count = 0;
@@ -77,9 +78,8 @@ function setup() { 
 
 function draw() {
   background("skyblue");
-	drawSprites();
 	
-	console.log(frameCount);
+	//console.log(frameCount);
 	fill("black");
 	textSize(35);
 	textFont("monospace");
@@ -90,6 +90,18 @@ function draw() {
 	text("SCORE:"+Math.round(count),320,60);
 	text(coincount,250,60);
 	text(" x ",200,60);
+
+ if(gameState === collision){
+   ground.velocityX = 0;
+   pipesGroup.setVelocityXEach(0);
+   
+   if(keyDown("UP_ARROW") && mario.y>329){ 
+     gameState = PLAY;
+    pipesGroup.destroyEach();
+    
+   }
+ }
+
   if(gameState === PLAY){
     ground.velocityX = -7;
 		count= count +0.1;
@@ -99,6 +111,10 @@ function draw() {
 
     if(keyDown("UP_ARROW") && mario.y>329){ 
       mario.velocityY = -20;
+    }
+
+    if(mario.isTouching(pipesGroup)){
+      gameState = collision;
     }
 
     if(keyWentDown("space")){
@@ -114,11 +130,8 @@ function draw() {
     spawnClouds();
     spawnEnemies();
 		spawnCoins();
-    if(pipesGroup.isTouching(mario)){
-			
-			count = count-1;
-      gameState = END;
-    }
+  
+
     if(enemyGroup.isTouching(mario)){
 			score=score-1;
 			count = count-5;
@@ -173,7 +186,9 @@ function draw() {
 	 instruct.lifetime =150;
   }
   mario.collide(invisibleground);
-  console.log(mario.y);  
+ 
+  //console.log(mario.y);  
+  drawSprites();
 }
 function spawnPipes(){
   if(frameCount %90  === 0){
